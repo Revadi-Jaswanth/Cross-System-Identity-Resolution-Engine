@@ -16,8 +16,13 @@ class Config:
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'default_jwt_secret_key_change_me_in_production_1234!')
     ENCRYPTION_KEY = os.getenv('ENCRYPTION_KEY', 'default_encryption_key_change_me_in_production_1234!')
 
-    # Database
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'postgresql://admin:supersecuredbpassword@localhost:5432/identity_resolution')
+    # Database — Render provides postgres:// but SQLAlchemy needs postgresql://
+    _raw_db_url = os.getenv('DATABASE_URL', 'postgresql://admin:supersecuredbpassword@localhost:5432/identity_resolution')
+    if _raw_db_url.startswith('postgres://'):
+        _raw_db_url = _raw_db_url.replace('postgres://', 'postgresql+psycopg2://', 1)
+    elif _raw_db_url.startswith('postgresql://'):
+        _raw_db_url = _raw_db_url.replace('postgresql://', 'postgresql+psycopg2://', 1)
+    SQLALCHEMY_DATABASE_URI = _raw_db_url
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Privacy Deterministic Hashing
