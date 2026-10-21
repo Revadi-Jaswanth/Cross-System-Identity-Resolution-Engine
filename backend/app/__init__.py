@@ -15,12 +15,15 @@ from flask_sqlalchemy import SQLAlchemy
 from app.utils.helpers import HelperUtils
 from app.exceptions import IdentityResolutionException
 
+LOG_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../logs'))
+os.makedirs(LOG_DIR, exist_ok=True)
+
 # Configure logging to write to folder logs
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
     handlers=[
-        logging.FileHandler(os.path.join(os.path.dirname(__file__), '../logs/app.log')),
+        logging.FileHandler(os.path.join(LOG_DIR, 'app.log')),
         logging.StreamHandler()
     ]
 )
@@ -56,7 +59,7 @@ def create_app(config_class=None) -> Flask:
     jwt.init_app(app)
 
     # Ensure logs folder exists
-    os.makedirs(os.path.join(app.root_path, '../logs'), exist_ok=True)
+    os.makedirs(LOG_DIR, exist_ok=True)
 
     # Configure JWT Callback Handlers
     register_jwt_callbacks(jwt)
