@@ -1,0 +1,204 @@
+{
+  "info": {
+    "name": "VeriSync API Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"adminpass\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Identities",
+      "item": [
+        {
+          "name": "Ingest Identity",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"system_source\": \"AadhaarService\",\n  \"system_uid\": \"A1001\",\n  \"organization_id\": 1,\n  \"full_name\": \"Rajesh Kumar\",\n  \"mobile\": \"+919999999999\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/identities/ingest",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "identities", "ingest"]
+            }
+          }
+        },
+        {
+          "name": "Bulk Ingest",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"records\": [\n    {\n      \"system_source\": \"AadhaarService\",\n      \"system_uid\": \"A1002\",\n      \"organization_id\": 1,\n      \"full_name\": \"Anil Sharma\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/identities/ingest/bulk",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "identities", "ingest", "bulk"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Resolution",
+      "item": [
+        {
+          "name": "Resolve Identity",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"system_source\": \"ABHAService\",\n  \"system_uid\": \"AB11\",\n  \"organization_id\": 1,\n  \"full_name\": \"Rajesh Kumar\",\n  \"mobile\": \"+919999999999\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/resolution/resolve",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "resolution", "resolve"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clusters",
+      "item": [
+        {
+          "name": "Get Cluster & Golden Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/v1/clusters/{{cluster_uuid}}",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "clusters", "{{cluster_uuid}}"]
+            }
+          }
+        },
+        {
+          "name": "Merge Clusters",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source_cluster_uuid\": \"{{source_uuid}}\",\n  \"target_cluster_uuid\": \"{{target_uuid}}\",\n  \"confidence_score\": 95.0,\n  \"source_version\": 1,\n  \"target_version\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/clusters/merge",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "clusters", "merge"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "System",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/system/health",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "system", "health"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

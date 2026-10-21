@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: identity_db
+    environment:
+      POSTGRES_DB: identity_resolution
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: supersecuredbpassword
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - identity_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d identity_resolution"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: identity_backend
+    environment:
+      DATABASE_URL: postgresql://admin:supersecuredbpassword@db:5432/identity_resolution
+      JWT_SECRET_KEY: supersecurejwtsecrettokenkey
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - identity_net
+    ports:
+      - "5000:5000"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: identity_frontend
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    networks:
+      - identity_net
+
+volumes:
+  pgdata:
+
+networks:
+  identity_net:
+    driver: bridge

@@ -1,0 +1,37 @@
+name: CI/CD Production Hardening pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  lint-test-build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code Repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python Runtime
+      uses: actions/setup-python@v4
+      with:
+        python-python: '3.11'
+
+    - name: Run Backend Tests
+      run: |
+        cd backend
+        pip install -r requirements.txt
+        pytest
+
+    - name: Set up Node Environment
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    - name: Run Frontend Lint & Tests
+      run: |
+        cd frontend
+        npm install
+        npm run build

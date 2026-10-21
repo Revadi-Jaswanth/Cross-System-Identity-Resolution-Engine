@@ -1,0 +1,209 @@
+openapi: 3.0.3
+info:
+  title: Cross-System Identity Resolution Engine API
+  description: Enterprise REST API layer exposing identity ingestion, resolution matching, cluster merging, golden profiles, and settings management.
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000/api/v1
+paths:
+  /identities/ingest:
+    post:
+      summary: Ingest single identity record
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityIngestPayload'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+
+  /identities/ingest/bulk:
+    post:
+      summary: Ingest bulk identity records
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - records
+              properties:
+                records:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/IdentityIngestPayload'
+      responses:
+        '200':
+          description: Success
+        '207':
+          description: Multi-Status (partial failures)
+
+  /resolution/resolve:
+    post:
+      summary: Resolve matching cluster for a payload
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityIngestPayload'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+
+  /clusters/{uuid}:
+    get:
+      summary: Retrieve cluster and dynamic Golden Profile
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+        '404':
+          description: Not Found
+
+  /clusters/merge:
+    post:
+      summary: Execute transactional cluster merge
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - source_cluster_uuid
+                - target_cluster_uuid
+                - confidence_score
+                - source_version
+                - target_version
+              properties:
+                source_cluster_uuid:
+                  type: string
+                target_cluster_uuid:
+                  type: string
+                confidence_score:
+                  type: number
+                source_version:
+                  type: integer
+                target_version:
+                  type: integer
+      responses:
+        '200':
+          description: Success
+        '409':
+          description: Conflict (Optimistic locking failed)
+        '422':
+          description: Unprocessable Entity (Policy blocked)
+
+  /verification/verify:
+    post:
+      summary: Submit a verification request
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - organization_id
+                - system_source
+                - system_uid
+              properties:
+                organization_id:
+                  type: integer
+                system_source:
+                  type: string
+                system_uid:
+                  type: string
+      responses:
+        '200':
+          description: Success
+
+  /system/health:
+    get:
+      summary: System diagnostics status
+      responses:
+        '200':
+          description: Success
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    IdentityIngestPayload:
+      type: object
+      required:
+        - system_source
+        - system_uid
+        - organization_id
+      properties:
+        system_source:
+          type: string
+          example: AadhaarService
+        system_uid:
+          type: string
+          example: A1234
+        organization_id:
+          type: integer
+          example: 1
+        full_name:
+          type: string
+          example: Rajesh Kumar
+        mobile:
+          type: string
+          example: "+919999999999"
+    StandardResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+        error:
+          type: object
+        timestamp:
+          type: string
+        request_id:
+          type: string
+        execution_time_ms:
+          type: number

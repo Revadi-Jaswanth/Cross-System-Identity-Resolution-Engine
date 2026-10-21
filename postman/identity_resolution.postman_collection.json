@@ -1,0 +1,201 @@
+{
+  "info": {
+    "_postman_id": "834c9c1b-f81d-4eb0-8025-0d04c44f0b2f",
+    "name": "VeriSync API",
+    "description": "API collection placeholder for registering administrative accounts, logging in to retrieve JWT authorization, checking system dashboard statistics, ingesting multi-system records (Aadhaar, ABHA, DigiLocker, Phone, Email), and performing identity resolution lookup queries.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register Admin User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"email\": \"admin@identityresolution.gov.in\",\n  \"password\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Identity Engine",
+      "item": [
+        {
+          "name": "Ingest Identity Records",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"system_source\": \"DigiLocker\",\n  \"system_uid\": \"DL-9821-3941\",\n  \"aadhaar_number\": \"1234-5678-9012\",\n  \"abha_number\": \"91-2345-6789-01\",\n  \"digilocker_id\": \"dl_user_alpha\",\n  \"mobile_number\": \"+919876543210\",\n  \"email_address\": \"user.alpha@email.com\",\n  \"full_name\": \"Amit Kumar Sharma\",\n  \"date_of_birth\": \"1990-05-14\",\n  \"gender\": \"M\",\n  \"address\": \"Flat 101, Green Meadows, Sector 62, Noida, UP\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/identity/ingest",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "identity",
+                "ingest"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resolve Identity Linkages",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query_attributes\": {\n    \"full_name\": \"Amit K. Sharma\",\n    \"mobile_number\": \"+919876543210\",\n    \"email_address\": \"user.alpha@email.com\"\n  },\n  \"similarity_threshold\": 85.0\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/identity/resolve",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "identity",
+                "resolve"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Dashboard Metrics",
+      "item": [
+        {
+          "name": "Retrieve Stats Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/stats",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "stats"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "jwt_token_here",
+      "type": "string"
+    }
+  ]
+}
