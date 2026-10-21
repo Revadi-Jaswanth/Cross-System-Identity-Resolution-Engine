@@ -15,14 +15,19 @@ from flask_sqlalchemy import SQLAlchemy
 from app.utils.helpers import HelperUtils
 from app.exceptions import IdentityResolutionException
 
-# Configure logging to write to folder logs
+# Configure logging — use file + stdout locally, stdout-only on cloud platforms
+_log_handlers = [logging.StreamHandler()]
+try:
+    _log_dir = os.path.join(os.path.dirname(__file__), '../logs')
+    os.makedirs(_log_dir, exist_ok=True)
+    _log_handlers.append(logging.FileHandler(os.path.join(_log_dir, 'app.log')))
+except (OSError, PermissionError):
+    pass  # Cloud environments (Render, etc.) — log to stdout only
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
-    handlers=[
-        logging.FileHandler(os.path.join(os.path.dirname(__file__), '../logs/app.log')),
-        logging.StreamHandler()
-    ]
+    handlers=_log_handlers
 )
 logger = logging.getLogger(__name__)
 
